@@ -39,10 +39,10 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
           <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-            W
+            N
           </div>
           <span className={cn('font-bold text-xl tracking-tight', scrolled ? 'text-blue-900' : 'text-blue-600')}>
-            WebQuoter
+            NASANI
           </span>
         </Link>
 

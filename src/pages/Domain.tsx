@@ -111,7 +111,7 @@ const Domain = () => {
       {/* Why Register With Us */}
       <section className="bg-blue-50 rounded-[3rem] p-12 md:p-20 space-y-12">
         <div className="text-center space-y-4">
-          <h2 className="text-4xl font-bold text-blue-900">Tại sao nên đăng ký tên miền tại WebQuoter?</h2>
+          <h2 className="text-4xl font-bold text-blue-900">Tại sao nên đăng ký tên miền tại NASANI?</h2>
           <p className="text-gray-500">Chúng tôi cung cấp dịch vụ đăng ký tên miền nhanh chóng, an toàn và hỗ trợ tận tâm.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

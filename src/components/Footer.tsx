@@ -10,9 +10,9 @@ const Footer = () => {
         <div className="space-y-6">
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-              W
+              N
             </div>
-            <span className="font-bold text-2xl text-white tracking-tight">WebQuoter</span>
+            <span className="font-bold text-2xl text-white tracking-tight">NASANI</span>
           </Link>
           <p className="text-sm leading-relaxed text-gray-400">
             Giải pháp báo giá thiết kế website tự động, nhanh chóng và minh bạch. 

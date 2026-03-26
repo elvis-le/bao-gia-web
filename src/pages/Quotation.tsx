@@ -127,16 +127,43 @@ const Quotation = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Mock API call
-    setTimeout(() => {
+    
+    const selectedType = basePrice === 5000000 ? 'Landing Page' : 'Website Cơ bản';
+
+    try {
+      const response = await fetch('/api/send-consultation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...contactForm,
+          quotationData: {
+            type: selectedType,
+            languages: languages,
+            total: totalPrice,
+            features: selectedFeatures.map(f => f.name)
+          }
+        }),
+      });
+
+      if (response.ok) {
+        setShowSuccess(true);
+        setContactForm({ name: '', phone: '', email: '', message: '' });
+        setTimeout(() => setShowSuccess(false), 5000);
+      } else {
+        console.error('Failed to send consultation request');
+        alert('Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau.');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Có lỗi xảy ra khi kết nối tới máy chủ. Vui lòng thử lại sau.');
+    } finally {
       setIsSubmitting(false);
-      setShowSuccess(true);
-      setContactForm({ name: '', phone: '', email: '', message: '' });
-      setTimeout(() => setShowSuccess(false), 5000);
-    }, 1500);
+    }
   };
 
   return (
