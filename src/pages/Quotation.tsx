@@ -5,6 +5,7 @@ import { Check, Download, Send, Info, Globe, Calculator, Plus, Minus, Trash2 } f
 import { motion, AnimatePresence } from 'motion/react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 
 import { cn } from '../lib/utils';
 
@@ -50,41 +51,33 @@ const Quotation = () => {
     }
   };
 
-  const handleExportPDF = () => {
-    const doc = new jsPDF();
+  const handleExportPDF = async () => {
+    const element = document.getElementById('pdf-quotation-template');
+    if (!element) return;
+
+    // Temporarily show the template for capturing
+    element.style.display = 'block';
     
-    // Add title
-    doc.setFontSize(22);
-    doc.text('BAO GIA THIET KE WEBSITE', 105, 20, { align: 'center' });
-    
-    doc.setFontSize(12);
-    doc.text(`Ngay: ${new Date().toLocaleDateString('vi-VN')}`, 20, 30);
-    doc.text(`Khach hang: ${contactForm.name || 'Quý khách'}`, 20, 37);
+    try {
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
 
-    // Table data
-    const tableData = [
-      ['Loai website', basePrice === 5000000 ? 'Landing Page' : 'Website Co ban', basePrice.toLocaleString('vi-VN') + ' VND'],
-      ...selectedFeatures.map(f => [f.name, 'Tinh nang', f.price.toLocaleString('vi-VN') + ' VND']),
-      ['Ngon ngu', `${languages} ngon ngu`, ((languages - 1) * 1500000).toLocaleString('vi-VN') + ' VND'],
-    ];
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    autoTable(doc, {
-      startY: 45,
-      head: [['Hang muc', 'Chi tiet', 'Don gia']],
-      body: tableData,
-      theme: 'grid',
-      headStyles: { fillColor: [37, 99, 235] },
-    });
-
-    const finalY = (doc as any).lastAutoTable.finalY + 10;
-    doc.setFontSize(16);
-    doc.text(`TONG CONG: ${totalPrice.toLocaleString('vi-VN')} VND`, 20, finalY);
-
-    doc.setFontSize(10);
-    doc.text('Luu y: Bao gia co gia tri trong 30 ngay.', 20, finalY + 15);
-    doc.text('Lien he: 090 123 4567 | contact@webquoter.vn', 20, finalY + 22);
-
-    doc.save(`Bao-Gia-Web-${Date.now()}.pdf`);
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Bao-Gia-Web-${Date.now()}.pdf`);
+    } catch (error) {
+      console.error('PDF Export Error:', error);
+    } finally {
+      element.style.display = 'none';
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -360,6 +353,70 @@ const Quotation = () => {
               </p>
             </div>
           </div>
+        </div>
+      </div>
+      {/* Hidden PDF Template */}
+      <div id="pdf-quotation-template" style={{ display: 'none', width: '800px', padding: '40px', background: 'white', fontFamily: 'Inter, sans-serif' }}>
+        <div style={{ borderBottom: '2px solid #2563eb', paddingBottom: '20px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e3a8a', margin: 0 }}>BÁO GIÁ THIẾT KẾ WEBSITE</h1>
+            <p style={{ color: '#6b7280', margin: '5px 0 0 0' }}>Ngày lập: {new Date().toLocaleDateString('vi-VN')}</p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#2563eb', margin: 0 }}>NASANI AGENCY</h2>
+            <p style={{ fontSize: '12px', color: '#6b7280', margin: '2px 0' }}>Hotline: 090 123 4567</p>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: '30px' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 'bold', borderBottom: '1px solid #e5e7eb', paddingBottom: '5px' }}>THÔNG TIN KHÁCH HÀNG</h3>
+          <p style={{ margin: '10px 0' }}><strong>Khách hàng:</strong> {contactForm.name || 'Quý khách'}</p>
+          <p style={{ margin: '10px 0' }}><strong>Số điện thoại:</strong> {contactForm.phone || 'Chưa cung cấp'}</p>
+          <p style={{ margin: '10px 0' }}><strong>Email:</strong> {contactForm.email || 'Chưa cung cấp'}</p>
+        </div>
+
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px' }}>
+          <thead>
+            <tr style={{ background: '#2563eb', color: 'white' }}>
+              <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #2563eb' }}>Hạng mục</th>
+              <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #2563eb' }}>Chi tiết</th>
+              <th style={{ padding: '12px', textAlign: 'right', border: '1px solid #2563eb' }}>Đơn giá (VNĐ)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ padding: '12px', border: '1px solid #e5e7eb' }}>Loại website</td>
+              <td style={{ padding: '12px', border: '1px solid #e5e7eb' }}>{basePrice === 5000000 ? 'Landing Page' : 'Website Cơ bản'}</td>
+              <td style={{ padding: '12px', border: '1px solid #e5e7eb', textAlign: 'right' }}>{basePrice.toLocaleString('vi-VN')}</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '12px', border: '1px solid #e5e7eb' }}>Ngôn ngữ</td>
+              <td style={{ padding: '12px', border: '1px solid #e5e7eb' }}>{languages} ngôn ngữ</td>
+              <td style={{ padding: '12px', border: '1px solid #e5e7eb', textAlign: 'right' }}>{((languages - 1) * 1500000).toLocaleString('vi-VN')}</td>
+            </tr>
+            {selectedFeatures.map((f, i) => (
+              <tr key={i}>
+                <td style={{ padding: '12px', border: '1px solid #e5e7eb' }}>Tính năng</td>
+                <td style={{ padding: '12px', border: '1px solid #e5e7eb' }}>{f.name}</td>
+                <td style={{ padding: '12px', border: '1px solid #e5e7eb', textAlign: 'right' }}>{f.price.toLocaleString('vi-VN')}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr style={{ background: '#f8fafc', fontWeight: 'bold' }}>
+              <td colSpan={2} style={{ padding: '15px', border: '1px solid #e5e7eb', textAlign: 'right', fontSize: '18px' }}>TỔNG CỘNG:</td>
+              <td style={{ padding: '15px', border: '1px solid #e5e7eb', textAlign: 'right', fontSize: '18px', color: '#2563eb' }}>{totalPrice.toLocaleString('vi-VN')} VNĐ</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div style={{ fontSize: '12px', color: '#6b7280', borderTop: '1px solid #e5e7eb', paddingTop: '20px' }}>
+          <p><strong>Lưu ý:</strong></p>
+          <ul style={{ paddingLeft: '20px' }}>
+            <li>Báo giá có giá trị trong vòng 30 ngày kể từ ngày lập.</li>
+            <li>Giá trên chưa bao gồm thuế VAT 10%.</li>
+            <li>Thời gian triển khai dự kiến: 15 - 30 ngày làm việc.</li>
+          </ul>
         </div>
       </div>
     </div>
