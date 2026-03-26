@@ -63,19 +63,19 @@ const Footer = () => {
           <ul className="space-y-4 text-sm">
             <li className="flex items-start space-x-3">
               <MapPin size={18} className="text-blue-500 shrink-0" />
-              <span>123 Đường ABC, Quận 1, TP. Hồ Chí Minh</span>
+              <span>Công viên phần mềm, Tòa nhà Saigon ICT, Lô 46 Quang Trung, Trung Mỹ Tây, Thành phố Hồ Chí Minh, Hồ Chí Minh 70000, Việt Nam</span>
             </li>
             <li className="flex items-center space-x-3">
               <Phone size={18} className="text-blue-500 shrink-0" />
-              <span>090 123 4567</span>
+              <span>0764389365</span>
             </li>
             <li className="flex items-center space-x-3">
               <Mail size={18} className="text-blue-500 shrink-0" />
-              <span>contact@webquoter.vn</span>
+              <span>khanhle03.nasani@gmail.com</span>
             </li>
             <li className="flex items-center space-x-3">
               <Globe size={18} className="text-blue-500 shrink-0" />
-              <span>www.webquoter.vn</span>
+              <span>www.nasani.vn</span>
             </li>
           </ul>
         </div>

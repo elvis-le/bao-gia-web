@@ -9,7 +9,7 @@ const Profile = () => {
   ];
 
   const experiences = [
-    { year: "2022 - Hiện tại", title: "Senior Web Developer", company: "WebQuoter Agency", desc: "Dẫn dắt team phát triển các giải pháp báo giá tự động và hệ thống quản trị doanh nghiệp." },
+    { year: "2022 - Hiện tại", title: "Senior Web Developer", company: "NASANI AGENCY", desc: "Dẫn dắt team phát triển các giải pháp báo giá tự động và hệ thống quản trị doanh nghiệp." },
     { year: "2019 - 2022", title: "Fullstack Developer", company: "TechSolutions VN", desc: "Phát triển các nền tảng E-commerce quy mô lớn cho khách hàng quốc tế." },
     { year: "2017 - 2019", title: "Frontend Developer", company: "Creative Studio", desc: "Thiết kế và lập trình giao diện người dùng cho các ứng dụng web hiện đại." },
   ];
@@ -39,15 +39,15 @@ const Profile = () => {
           <div className="flex flex-wrap justify-center md:justify-start gap-4">
             <div className="flex items-center space-x-2 px-4 py-2 bg-gray-50 rounded-full text-sm font-medium text-gray-600">
               <Mail size={16} className="text-blue-600" />
-              <span>contact@webquoter.vn</span>
+              <span>khanhle03.nasani@gmail.com</span>
             </div>
             <div className="flex items-center space-x-2 px-4 py-2 bg-gray-50 rounded-full text-sm font-medium text-gray-600">
               <Phone size={16} className="text-blue-600" />
-              <span>090 123 4567</span>
+              <span>0764389365</span>
             </div>
             <div className="flex items-center space-x-2 px-4 py-2 bg-gray-50 rounded-full text-sm font-medium text-gray-600">
               <MapPin size={16} className="text-blue-600" />
-              <span>TP. Hồ Chí Minh, Việt Nam</span>
+              <span>Tòa nhà Saigon ICT, Lô 46 Quang Trung, Quận 12, TP. Hồ Chí Minh</span>
             </div>
           </div>
         </div>

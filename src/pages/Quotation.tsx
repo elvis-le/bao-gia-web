@@ -3,9 +3,9 @@ import { FEATURES } from '../constants';
 import { Feature } from '../types';
 import { Check, Download, Send, Info, Globe, Calculator, Plus, Minus, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import html2canvas from 'html2canvas';
+import { domToPng } from 'modern-screenshot';
 
 import { cn } from '../lib/utils';
 
@@ -52,31 +52,78 @@ const Quotation = () => {
   };
 
   const handleExportPDF = async () => {
+    console.log('Starting PDF export process...');
     const element = document.getElementById('pdf-quotation-template');
-    if (!element) return;
+    if (!element) {
+      console.error('Template element not found');
+      alert('Lỗi: Không tìm thấy mẫu báo giá. Vui lòng tải lại trang.');
+      return;
+    }
 
-    // Temporarily show the template for capturing
+    // Make it visible for capture but keep it off-screen
     element.style.display = 'block';
+    element.style.visibility = 'visible';
+    element.style.opacity = '1';
     
     try {
-      const canvas = await html2canvas(element, {
+      console.log('Capturing element with modern-screenshot...');
+      
+      // Ensure element is visible for capture
+      element.style.display = 'block';
+      element.style.visibility = 'visible';
+      element.style.opacity = '1';
+      element.style.left = '0';
+      element.style.top = '0';
+      element.style.position = 'fixed';
+      element.style.zIndex = '9999';
+
+      // Wait for rendering and fonts
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const dataUrl = await domToPng(element, {
         scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      // Reset styles
+      element.style.display = 'none';
+      element.style.visibility = 'hidden';
+      element.style.opacity = '0';
+      element.style.left = '-9999px';
+      element.style.position = 'absolute';
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Bao-Gia-Web-${Date.now()}.pdf`);
+      console.log('Image captured successfully. Generating PDF...');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      
+      console.log('Attempting to save PDF file...');
+      try {
+        pdf.save(`Bao-Gia-Web-${Date.now()}.pdf`);
+      } catch (saveError) {
+        console.warn('pdf.save failed, trying fallback method:', saveError);
+        const blob = pdf.output('blob');
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Bao-Gia-Web-${Date.now()}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+      console.log('PDF export successful');
     } catch (error) {
-      console.error('PDF Export Error:', error);
+      console.error('Detailed PDF Export Error:', error);
+      alert('Có lỗi xảy ra khi xuất PDF: ' + (error instanceof Error ? error.message : 'Lỗi không xác định'));
     } finally {
       element.style.display = 'none';
+      element.style.visibility = 'hidden';
+      element.style.opacity = '0';
     }
   };
 
@@ -355,16 +402,33 @@ const Quotation = () => {
           </div>
         </div>
       </div>
-      {/* Hidden PDF Template */}
-      <div id="pdf-quotation-template" style={{ display: 'none', width: '800px', padding: '40px', background: 'white', fontFamily: 'Inter, sans-serif' }}>
+      {/* Hidden PDF Template - Positioned off-screen but still in render tree */}
+      <div 
+        id="pdf-quotation-template" 
+        style={{ 
+          position: 'absolute',
+          top: '-20000px',
+          left: '-9999px',
+          width: '800px', 
+          padding: '60px', 
+          background: 'white', 
+          fontFamily: 'Inter, sans-serif',
+          display: 'none'
+        }}
+      >
         <div style={{ borderBottom: '2px solid #2563eb', paddingBottom: '20px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e3a8a', margin: 0 }}>BÁO GIÁ THIẾT KẾ WEBSITE</h1>
             <p style={{ color: '#6b7280', margin: '5px 0 0 0' }}>Ngày lập: {new Date().toLocaleDateString('vi-VN')}</p>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#2563eb', margin: 0 }}>NASANI AGENCY</h2>
-            <p style={{ fontSize: '12px', color: '#6b7280', margin: '2px 0' }}>Hotline: 090 123 4567</p>
+          <div style={{ textAlign: 'right', maxWidth: '500px' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: '#2563eb', margin: '0 0 10px 0' }}>NASANI AGENCY</h2>
+            <p style={{ fontSize: '10px', color: '#374151', margin: '2px 0', lineHeight: '1.5' }}>
+              <strong>Địa chỉ:</strong> Công viên phần mềm, Tòa nhà Saigon ICT, Lô 46 Quang Trung, Trung Mỹ Tây, Thành phố Hồ Chí Minh, Hồ Chí Minh 70000, Việt Nam
+            </p>
+            <p style={{ fontSize: '10px', color: '#374151', margin: '2px 0' }}>
+              <strong>SDT:</strong> 0764389365 | <strong>Email:</strong> khanhle03.nasani@gmail.com
+            </p>
           </div>
         </div>
 
